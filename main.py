@@ -2,6 +2,7 @@ from telegram.ext import Updater, CommandHandler
 import requests
 import re
 from sys import argv
+import os
 
 def get_url():
     contents = requests.get('https://random.dog/woof.json').json()
@@ -20,16 +21,16 @@ def _help(bot, update):
     commands = [
         "Type /dogo or /dog to get a random dog",
         "Type /cat to get a random cat",
-        "To help insert new funcionalities check my github repo :  "
+        "To insert/suggest new funcionalities check my github repo :  https://github.com/PauloCarneiro99/WhatAmIDoingBot"
     ]
     s = "\n".join(commands)
     chatID = update.message.chat_id
-    bot.send_message(chat_id=chatID, text=s, parse_mode="Markdown")
+    bot.send_message(chat_id=chatID, text=s)
 
 def start(bot,update):
-    s = "Welcome to this random Bot.\n Use /help to see random commands already implemented.\n Hope this can bring you joy"
+    s = "Welcome to this random Bot.\n\n Use /help to see random commands already implemented.\n\n Hope you enjoy"
     chat_id = update.message.chat_id
-    bot.send_message(chat_id=chat_id, text=s, parse_mode="Markdown")
+    bot.send_message(chat_id=chat_id, text=s)
 
 def dogo(bot, update):
     url = get_dogo_image_url()
@@ -43,18 +44,15 @@ def cat(bot,update):
     bot.send_photo(chat_id=chat_id, photo=url)
 
 def main():
-    if len(argv) < 2:
-        print("Run again passing the Bot Token as a param")
-        exit()
-    updater = Updater(argv[1]) #put your bot token here
-    dp = updater.dispatcher
-    dp.add_handler(CommandHandler('help',_help))
-    dp.add_handler(CommandHandler('start',start))
-    dp.add_handler(CommandHandler('dogo',dogo))
-    dp.add_handler(CommandHandler('dog',dogo))
-    dp.add_handler(CommandHandler('cat',cat))
-    updater.start_polling()
-    updater.idle()
+	updater = Updater(os.environ['BOT_KEY'])
+	dp = updater.dispatcher
+	dp.add_handler(CommandHandler('help',_help))
+	dp.add_handler(CommandHandler('start',start))
+	dp.add_handler(CommandHandler('dogo',dogo))
+	dp.add_handler(CommandHandler('dog',dogo))
+	dp.add_handler(CommandHandler('cat',cat))
+	updater.start_polling()
+	updater.idle()
 
 if __name__ == '__main__':
-    main()
+	main()
